@@ -8,6 +8,8 @@ You can also do some other simple GET requests:
 4) /multiply?num1=3&num2=4 multiplies the two inputs and responses with the result
 5) /github?query=users/amehlhase316/repos (or other GitHub repo owners) will lead to receiving
    JSON which will for now only be printed in the console. See the todo below
+6) /division?num1=3&num2=4 divides the first input from the second input and responses with the result
+7) /addition?num1=3&num2=4 adds the two inputs and responses with the result
 
 The reading of the request is done "manually", meaning no library that helps making things a 
 little easier is used. This is done so you see exactly how to pars the request and 
@@ -229,7 +231,6 @@ class WebServer {
               builder.append("Content-Type: text/html; charset=utf-8\n");
               builder.append("\n");
               builder.append("Invalid syntax: Please use 2 integers for the request arguments.");
-              //builder.append("\n" + num1 + " * " + num2 + " = " + result);  
           }
 
         } else if (request.contains("github?")) {
@@ -273,7 +274,77 @@ class WebServer {
 	          builder.append("Invalid syntax. Please use the structure of '/github?query = users/amehlhase316/repos'");
           }
 
-        } else {
+        } else if (request.contains("bigger")) {
+        	Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+            // extract path parameters
+            query_pairs = splitQuery(request.replace("bigger?", ""));
+            
+            if (request.contains("num1") && request.contains("num2")) {
+          	  try {
+          		  // extract required fields from parameters
+                    Integer num1 = Integer.parseInt(query_pairs.get("num1"));
+                    Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+              	  // do math
+                    
+                    Integer result;
+                    if (num1 > num2) {
+                    	result = num1;
+                    } else {
+                    	result = num2;
+                    }
+                    
+      	          // Generate response
+      	          builder.append("HTTP/1.1 200 OK\n");
+      	          builder.append("Content-Type: text/html; charset=utf-8\n");
+      	          builder.append("\n");
+      	          builder.append(num1 + " v. " + num2 + "? The bigger number is " + result);
+          	  } catch (Exception e){
+          		  // failure
+                    builder.append("HTTP/1.1 400 Bad Request\n");
+                    builder.append("Content-Type: text/html; charset=utf-8\n");
+                    builder.append("\n");
+                    builder.append("Invalid syntax: Please use 2 integers for the request arguments.");
+          	  }
+          	  
+            } else { // failure
+                builder.append("HTTP/1.1 400 Bad Request\n");
+                builder.append("Content-Type: text/html; charset=utf-8\n");
+                builder.append("\n");
+                builder.append("Invalid syntax: Please use 2 integers for the request arguments.");
+            }
+        } else if (request.contains("addition")) {
+        	Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+            // extract path parameters
+            query_pairs = splitQuery(request.replace("addition?", ""));
+            
+            if (request.contains("num1") && request.contains("num2")) {
+          	  try {
+          		  // extract required fields from parameters
+                    Integer num1 = Integer.parseInt(query_pairs.get("num1"));
+                    Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+              	  // do math
+                    Integer result = num1 + num2;
+                    
+      	          // Generate response
+      	          builder.append("HTTP/1.1 200 OK\n");
+      	          builder.append("Content-Type: text/html; charset=utf-8\n");
+      	          builder.append("\n");
+      	          builder.append("Result is: " + result);
+          	  } catch (Exception e){
+          		  // failure
+                    builder.append("HTTP/1.1 400 Bad Request\n");
+                    builder.append("Content-Type: text/html; charset=utf-8\n");
+                    builder.append("\n");
+                    builder.append("Invalid syntax: Please use 2 integers for the request arguments.");
+          	  }
+          	  
+            } else { // failure
+                builder.append("HTTP/1.1 400 Bad Request\n");
+                builder.append("Content-Type: text/html; charset=utf-8\n");
+                builder.append("\n");
+                builder.append("Invalid syntax: Please use 2 integers for the request arguments.");
+            }
+        }else {
           // if the request is not recognized at all
 
           builder.append("HTTP/1.1 400 Bad Request\n");
