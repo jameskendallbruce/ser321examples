@@ -25,6 +25,8 @@ import java.util.Random;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.nio.charset.Charset;
+import org.json.*;
+
 
 class WebServer {
   public static void main(String args[]) {
@@ -194,7 +196,6 @@ class WebServer {
             builder.append("File not found: " + file);
           }
         } else if (request.contains("multiply?")) {
-        	//THIS IS WHERE THIS STARTS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
           // This multiplies two numbers, there is NO error handling, so when
           // wrong data is given this just crashes
 
@@ -231,11 +232,8 @@ class WebServer {
               //builder.append("\n" + num1 + " * " + num2 + " = " + result);  
           }
 
-          // TODO: Include error handling here with a correct error code and
-          // a response that makes sense
-          //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
         } else if (request.contains("github?")) {
+        	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
           // pulls the query from the request and runs it with GitHub's REST API
           // check out https://docs.github.com/rest/reference/
           //
@@ -245,17 +243,35 @@ class WebServer {
           //     "/repos/OWNERNAME/REPONAME/contributors"
 
           Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          query_pairs = splitQuery(request.replace("github?", ""));
-          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
-          System.out.println(json);
+          try {
+              query_pairs = splitQuery(request.replace("github?", ""));
+              String url = "https://api.github.com/" + query_pairs.get("query");
+              String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
+              //System.out.println(json);
+              System.out.println("QUERY:\n"+url);
+              
+              JSONArray repoArray = new JSONArray(json);
+	          builder.append("HTTP/1.1 200 OK\n");
+	          builder.append("Content-Type: text/html; charset=utf-8\n");
+	          builder.append("\n");
+              for(int i=0; i<repoArray.length(); i++){
 
-          builder.append("Check the todos mentioned in the Java source file");
-          // TODO: Parse the JSON returned by your fetch and create an appropriate
-          // response
-          // and list the owner name, owner id and name of the public repo on your webpage, e.g.
-          // amehlhase, 46384989 -> memoranda
-          // amehlhase, 46384989 -> ser316examples
-          // amehlhase, 46384989 -> test316
+            	  JSONObject repo = repoArray.getJSONObject(i);
+                  String repoName = repo.getString("name");
+                  JSONObject owner = repo.getJSONObject("owner");
+                  String ownerName = owner.getString("login");
+                  String idNum = owner.get("id").toString();
+    	          builder.append("  { " + ownerName + ", " + idNum + " -> " + repoName + " }  \n");
+
+
+              } 
+          } catch (Exception e){
+        	  // failure
+        	  builder.append("HTTP/1.1 400 Bad Request\n");
+        	  builder.append("Content-Type: text/html; charset=utf-8\n");
+	          builder.append("\n");
+	          builder.append("Invalid syntax. Please use the structure of '/github?query = users/amehlhase316/repos'");
+          }
 
         } else {
           // if the request is not recognized at all
