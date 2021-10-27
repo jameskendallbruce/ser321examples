@@ -15,8 +15,18 @@ public class Multiply {
         int argX = 0;
         int argY = 0;
         try {
-          argX = Integer.parseInt(args[0]);
-          argY = Integer.parseInt(args[1]);
+            // checks the number of arguments as sets X and Y accordingly
+            if(args.length == 2) {
+            	argX = Integer.parseInt(args[0]);
+            	argY = Integer.parseInt(args[1]);
+            } else if (args.length == 1) {
+            	argX = Integer.parseInt(args[0]);
+            	argY = 0;
+            } else {
+            	argX = 0;
+            	argY = 0;
+            }
+
         } catch (Exception e) {
           System.out.println("Arguments: " + args[0] + ", " + args[1] + " must be integers.");
           System.exit(1);
