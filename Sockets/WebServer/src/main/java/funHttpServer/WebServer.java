@@ -9,7 +9,7 @@ You can also do some other simple GET requests:
 5) /github?query=users/amehlhase316/repos (or other GitHub repo owners) will lead to receiving
    JSON which will for now only be printed in the console. See the todo below
 6) /division?num1=3&num2=4 divides the first input from the second input and responses with the result
-7) /addition?num1=3&num2=4 adds the two inputs and responses with the result
+7) /bigger?num1=3&num2=4 reponse returns the greater value
 
 The reading of the request is done "manually", meaning no library that helps making things a 
 little easier is used. This is done so you see exactly how to pars the request and 
